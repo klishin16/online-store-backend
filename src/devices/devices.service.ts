@@ -54,6 +54,9 @@ export class DevicesService {
         {
           model: Category,
           where: categoryFilter
+        },
+        {
+          model: Brand
         }
       ],
       attributes: {exclude: ['createdAt', 'updatedAt']},
@@ -75,8 +78,13 @@ export class DevicesService {
     return await this.deviceRepository.findByPk(deviceId)
   }
 
-  update(id: number, updateDeviceDto: UpdateDeviceDto) {
-    return `This action updates a #${id} device`;
+  //This action updates a #${id} device
+  async update(id: number, updateDeviceDto: UpdateDeviceDto) {
+    if (updateDeviceDto.categoriesId) {
+      const device = await this.deviceRepository.findByPk(id)
+      await device.$set('categories', updateDeviceDto.categoriesId)
+    }
+    return await this.deviceRepository.update(updateDeviceDto, {where: {id: id}})
   }
 
   remove(id: number) {

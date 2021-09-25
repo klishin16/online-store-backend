@@ -1,7 +1,7 @@
 import {BelongsToMany, Column, DataType, Model, Table} from "sequelize-typescript";
 import {ApiProperty} from "@nestjs/swagger";
-import {User} from "../users/models/users.model";
-import {UserRoles} from "./user-roles.model";
+import {User} from "../../users/models/users.model";
+import {UserRoles} from "../user-roles.model";
 
 interface RoleCreationAttrs {
     value: string;

@@ -46,7 +46,7 @@ export class DevicesController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateDeviceDto: UpdateDeviceDto) {
+  update(@Param('id') id: number, @Body() updateDeviceDto: UpdateDeviceDto) {
     return this.devicesService.update(+id, updateDeviceDto);
   }
 

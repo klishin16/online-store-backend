@@ -1,4 +1,4 @@
-import {Body, Controller, Get, Param, Post, UseGuards} from '@nestjs/common';
+import {Body, Controller, Delete, Get, Param, Post, UseGuards} from '@nestjs/common';
 import {CreateUserDto} from "./dto/create-user.dto";
 import {UsersService} from "./users.service";
 import {ApiOperation, ApiQuery, ApiResponse, ApiTags} from "@nestjs/swagger";
@@ -25,8 +25,8 @@ export class UsersController {
 
     @ApiOperation({summary: 'Получить всех пользователей'})
     @ApiResponse({status: 200, type: [User]})
-    @Roles(UserRole.Admin)
-    @UseGuards(RolesGuard)
+    // @Roles(UserRole.Admin)
+    // @UseGuards(RolesGuard)
     @Get()
     getAll() {
         return this.usersService.getAllUsers();
@@ -46,14 +46,30 @@ export class UsersController {
         return this.usersService.getUserByEmail(getUserDto.email);
     }
 
+    @ApiOperation({summary: 'Удалить поьзователя'})
+    @Delete(':id')
+    remove(@Param('id') id: number) {
+        return this.usersService.remove(id);
+    }
+
     @ApiOperation({summary: 'Выдать роль'})
     @ApiQuery({ name: 'role', enum: UserRole })
     @ApiResponse({status: 200})
     @Roles(UserRole.Admin)
     @UseGuards(RolesGuard)
-    @Post('/role')
+    @Post('/add-role')
     addRole(@Body() dto: AddRoleDto) {
         return this.usersService.addRole(dto);
+    }
+
+    @ApiOperation({summary: 'Убрать роль роль'})
+    @ApiQuery({ name: 'role', enum: UserRole })
+    @ApiResponse({status: 200})
+    @Roles(UserRole.Admin)
+    @UseGuards(RolesGuard)
+    @Post('/remove-role')
+    removeRole(@Body() dto: AddRoleDto) {
+        return this.usersService.removeRole(dto);
     }
 
     @ApiOperation({summary: 'Забанить пользователя'})

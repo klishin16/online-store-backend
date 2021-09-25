@@ -1,8 +1,7 @@
 import {BelongsToMany, Column, DataType, HasMany, HasOne, Model, Table} from "sequelize-typescript";
 import {ApiProperty} from "@nestjs/swagger";
-import {Role} from "../../roles/roles.model";
+import {Role} from "../../roles/models/roles.model";
 import {UserRoles} from "../../roles/user-roles.model";
-import {Post} from "../../posts/posts.model";
 import {Device, UserFavoriteDevices} from "../../devices/models/device.model";
 import {Basket} from "../../baskets/models/basket.model";
 
@@ -37,8 +36,6 @@ export class User extends Model<User, UserCreationAttrs> {
     @BelongsToMany(() => Role, () => UserRoles)
     roles: Role[];
 
-    @HasMany(() => Post)
-    posts: Post[];
 
     @BelongsToMany(() => Device, () => UserFavoriteDevices)
     favoriteDevices: Device[];

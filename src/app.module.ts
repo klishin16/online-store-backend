@@ -1,20 +1,18 @@
 import {MiddlewareConsumer, Module, NestModule} from "@nestjs/common";
 import {SequelizeModule} from "@nestjs/sequelize";
-import { UsersModule } from './users/users.module';
+import {UsersModule} from './users/users.module';
 import {ConfigModule} from "@nestjs/config";
 import {User} from "./users/models/users.model";
-import { RolesModule } from './roles/roles.module';
-import {Role} from "./roles/roles.model";
+import {RolesModule} from './roles/roles.module';
+import {Role} from "./roles/models/roles.model";
 import {UserRoles} from "./roles/user-roles.model";
-import { AuthModule } from './auth/auth.module';
-import { PostsModule } from './posts/posts.module';
-import {Post} from "./posts/posts.model";
-import { FilesModule } from './files/files.module';
+import {AuthModule} from './auth/auth.module';
+import {FilesModule} from './files/files.module';
 import {ServeStaticModule} from "@nestjs/serve-static";
 import * as path from 'path';
-import { DevicesModule } from './devices/devices.module';
-import { BrandsModule } from './brands/brands.module';
-import { CategoriesModule } from './categories/categories.module';
+import {DevicesModule} from './devices/devices.module';
+import {BrandsModule} from './brands/brands.module';
+import {CategoriesModule} from './categories/categories.module';
 import {Device, DeviceCategory, UserFavoriteDevices} from "./devices/models/device.model";
 import {Brand} from "./brands/models/brand.model";
 import {Category} from "./categories/models/category.model";
@@ -45,7 +43,6 @@ import {AppLoggerMiddleware} from "./logger.middleware";
                 User,
                 Role,
                 UserRoles,
-                Post,
                 Device,
                 Brand,
                 Category,
@@ -61,7 +58,6 @@ import {AppLoggerMiddleware} from "./logger.middleware";
         UsersModule,
         RolesModule,
         AuthModule,
-        PostsModule,
         FilesModule,
         DevicesModule,
         BrandsModule,

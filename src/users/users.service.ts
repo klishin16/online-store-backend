@@ -9,6 +9,7 @@ import * as bcrypt from 'bcrypt';
 import {UniqueConstraintError} from "sequelize";
 import {Device} from "../devices/models/device.model";
 import {Basket} from "../baskets/models/basket.model";
+import {Role} from "../roles/models/roles.model";
 
 @Injectable()
 export class UsersService {
@@ -54,7 +55,8 @@ export class UsersService {
             where: {id: userId},
             attributes: {exclude: ['createdAt', 'updatedAt']},
             include: [
-                {model: Basket}
+                {model: Basket},
+                {model: Role}
             ]
         })
     }
@@ -77,6 +79,15 @@ export class UsersService {
         throw new HttpException('Пользователь или роль не найдены', HttpStatus.NOT_FOUND);
     }
 
+    async removeRole(dto: AddRoleDto) {
+        const user = await this.userRepository.findByPk(dto.userId);
+        const role = await this.roleService.getRoleByValue(dto.value);
+        if (role && user) {
+            await user.$remove('role', role.id);
+            return dto;
+        }
+    }
+
     async ban(dto: BanUserDto) {
         const user = await this.userRepository.findByPk(dto.userId);
         if (!user) {
@@ -86,5 +97,9 @@ export class UsersService {
         user.banReason = dto.banReason;
         await user.save();
         return user;
+    }
+
+    async remove(id: number) {
+        await this.userRepository.destroy({where: {id : id}})
     }
 }
