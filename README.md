@@ -1,8 +1,8 @@
-## Не забудь звезду
+## Backed part for Online Store project
 
-в файле .development.env конфигурация для бд. Добавить свою.
+##Deploy
 
-#### npm run start:dev - Запуск
+#### npm run start:dev
 
 ##
 
