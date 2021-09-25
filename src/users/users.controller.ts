@@ -1,14 +1,14 @@
-import {Body, Controller, Get, Post, UseGuards, UsePipes} from '@nestjs/common';
+import {Body, Controller, Get, Param, Post, UseGuards} from '@nestjs/common';
 import {CreateUserDto} from "./dto/create-user.dto";
 import {UsersService} from "./users.service";
-import {ApiOperation, ApiResponse, ApiTags} from "@nestjs/swagger";
+import {ApiOperation, ApiQuery, ApiResponse, ApiTags} from "@nestjs/swagger";
 import {User} from "./models/users.model";
-import {JwtAuthGuard} from "../auth/jwt-auth.guard";
 import {Roles} from "../auth/roles-auth.decorator";
 import {RolesGuard} from "../auth/roles.guard";
 import {AddRoleDto} from "./dto/add-role.dto";
 import {BanUserDto} from "./dto/ban-user.dto";
-import {ValidationPipe} from "../pipes/validation.pipe";
+import {UserRole} from "../roles/entities/userRole.enum";
+import {GetUserDto} from "./dto/get-user.dto";
 
 @ApiTags('Пользователи')
 @Controller('users')
@@ -25,16 +25,31 @@ export class UsersController {
 
     @ApiOperation({summary: 'Получить всех пользователей'})
     @ApiResponse({status: 200, type: [User]})
-    @Roles("ADMIN")
+    @Roles(UserRole.Admin)
     @UseGuards(RolesGuard)
     @Get()
     getAll() {
         return this.usersService.getAllUsers();
     }
 
+    @ApiOperation({summary: 'Получить кокретного пользователя'})
+    @ApiResponse({status: 200, type: User})
+    @Get(':id')
+    getUser(@Param('id') id: number) {
+        return this.usersService.getUserById(id);
+    }
+
+    @ApiOperation({summary: 'Получить кокретного пользователя по email'})
+    @ApiResponse({status: 200, type: User})
+    @Post('byEmail')
+    getUserByEmail(@Body() getUserDto: GetUserDto) {
+        return this.usersService.getUserByEmail(getUserDto.email);
+    }
+
     @ApiOperation({summary: 'Выдать роль'})
+    @ApiQuery({ name: 'role', enum: UserRole })
     @ApiResponse({status: 200})
-    @Roles("ADMIN")
+    @Roles(UserRole.Admin)
     @UseGuards(RolesGuard)
     @Post('/role')
     addRole(@Body() dto: AddRoleDto) {
@@ -43,7 +58,7 @@ export class UsersController {
 
     @ApiOperation({summary: 'Забанить пользователя'})
     @ApiResponse({status: 200})
-    @Roles("ADMIN")
+    @Roles(UserRole.Admin)
     @UseGuards(RolesGuard)
     @Post('/ban')
     ban(@Body() dto: BanUserDto) {

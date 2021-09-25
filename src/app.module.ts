@@ -1,4 +1,4 @@
-import {Module} from "@nestjs/common";
+import {MiddlewareConsumer, Module, NestModule} from "@nestjs/common";
 import {SequelizeModule} from "@nestjs/sequelize";
 import { UsersModule } from './users/users.module';
 import {ConfigModule} from "@nestjs/config";
@@ -12,21 +12,21 @@ import {Post} from "./posts/posts.model";
 import { FilesModule } from './files/files.module';
 import {ServeStaticModule} from "@nestjs/serve-static";
 import * as path from 'path';
-import {log} from "util";
-import { BasketsController } from './baskets/baskets.controller';
-import { BasketsService } from './baskets/baskets.service';
-import { BasketsModule } from './baskets/baskets.module';
 import { DevicesModule } from './devices/devices.module';
-import { PurshasesModule } from './purshases/purshases.module';
 import { BrandsModule } from './brands/brands.module';
 import { CategoriesModule } from './categories/categories.module';
 import {Device, DeviceCategory, UserFavoriteDevices} from "./devices/models/device.model";
 import {Brand} from "./brands/models/brand.model";
 import {Category} from "./categories/models/category.model";
+import {Basket} from "./baskets/models/basket.model";
+import {BasketsModule} from "./baskets/baskets.module";
+import {BasketDevice} from "./baskets/models/basket_device.model";
+import {AppLoggerMiddleware} from "./logger.middleware";
+
 
 @Module({
-    controllers: [BasketsController],
-    providers: [BasketsService],
+    controllers: [],
+    providers: [],
     imports: [
         ConfigModule.forRoot({
            envFilePath: `.${process.env.NODE_ENV}.env`
@@ -50,21 +50,27 @@ import {Category} from "./categories/models/category.model";
                 Brand,
                 Category,
                 DeviceCategory,
-                UserFavoriteDevices
+                UserFavoriteDevices,
+                Basket,
+                BasketDevice
             ],
             autoLoadModels: true,
-            logging: sql => console.log("[DB] - ", sql)
+            // logging: sql => console.log("[DB] - ", sql)
+            logging: false
         }),
         UsersModule,
         RolesModule,
         AuthModule,
         PostsModule,
         FilesModule,
-        BasketsModule,
         DevicesModule,
-        PurshasesModule,
         BrandsModule,
         CategoriesModule,
+        BasketsModule,
     ]
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+    configure(consumer: MiddlewareConsumer): void {
+        consumer.apply(AppLoggerMiddleware).forRoutes('*');
+    }
+}

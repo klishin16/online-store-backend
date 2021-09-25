@@ -22,13 +22,17 @@ export class BrandsService {
 
   // This action returns all brands
   async findAll() {
-    return await this.brandRepository.findAll({include: {all: true}})
+    return await this.brandRepository.findAll({
+      include: {all: true},
+      attributes: {exclude: ['createdAt', 'updatedAt']}
+    })
   }
 
   // This action returns current brand
   async findOne(id: number) {
     return await this.brandRepository.findOne({where: {id: id}})
   }
+
 
   // This action updates a #${id} brand
   async update(id: number, updateBrandDto: UpdateBrandDto) {
@@ -38,7 +42,8 @@ export class BrandsService {
     }).then(resp => resp[1]) //only for postgres иначе resp = [x]
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} brand`;
+  // This action removes a #${id} brand
+  async remove(id: number) {
+    return await this.brandRepository.destroy({where: {id: id}});
   }
 }

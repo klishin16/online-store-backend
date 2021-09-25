@@ -9,7 +9,7 @@ import {Logger} from "@nestjs/common";
 const logger = new Logger("Main", true)
 async function start() {
     const PORT = process.env.PORT || 5000;
-    const app = await NestFactory.create(AppModule)
+    const app = await NestFactory.create(AppModule, )
 
     const config = new DocumentBuilder()
         .setTitle('Customizable Internet Shop Backend')
@@ -20,6 +20,11 @@ async function start() {
     const document = SwaggerModule.createDocument(app, config);
     SwaggerModule.setup('/api/docs', app, document)
 
+    app.enableCors({
+        allowedHeaders: "*",
+        origin: ["http://localhost:3000", "http://127.0.0.1:3000"],
+        credentials: true,
+    })
     app.useGlobalPipes(new ValidationPipe())
 
     await app.listen(PORT, () => logger.debug(`Server started on port = ${PORT}`))

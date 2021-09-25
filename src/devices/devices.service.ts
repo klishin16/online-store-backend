@@ -2,8 +2,14 @@ import {Dependencies, HttpException, HttpStatus, Injectable} from '@nestjs/commo
 import { CreateDeviceDto } from './dto/create-device.dto';
 import { UpdateDeviceDto } from './dto/update-device.dto';
 import {InjectModel} from "@nestjs/sequelize";
-import {Device} from "./models/device.model";
+import {Device, DeviceCategory} from "./models/device.model";
 import {UsersService} from "../users/users.service";
+import {Brand} from "../brands/models/brand.model";
+import {Category} from "../categories/models/category.model";
+import {AddCategoryDto} from "./dto/add-category.dto";
+import {CategoriesService} from "../categories/categories.service";
+import {FilesService} from "../files/files.service";
+import {Op} from "sequelize";
 
 
 // @Dependencies(UsersService)
@@ -12,12 +18,15 @@ export class DevicesService {
   constructor(
       @InjectModel(Device) private deviceRepository: typeof Device,
       private userService: UsersService,
+      private categoryService: CategoriesService,
+      private fileService: FilesService
   ) {}
 
   // This action adds a new device
-  async create(createDeviceDto: CreateDeviceDto) {
+  async create(createDeviceDto: CreateDeviceDto, image: any) {
     try {
-      const device = await this.deviceRepository.create(createDeviceDto)
+      const fileName = await this.fileService.createFile(image);
+      const device = await this.deviceRepository.create({...createDeviceDto, image: fileName})
       return device;
     } catch (e) {
       //TODO обработка всех ошибок
@@ -26,12 +35,44 @@ export class DevicesService {
   }
 
   //This action returns all devices
-  async findAll() {
-    return await this.deviceRepository.findAll({include: {all: true}});
+  async findAll(searchQuery?: string, categoryId?: number, minPrice?: number, maxPrice?: number) {
+    const categoryFilter = categoryId ? {id: categoryId} : undefined
+    console.log("CatF:", categoryFilter)
+
+    // const category = await this.categoryService.findOne(categoryId)
+
+    return await this.deviceRepository.findAll({
+      where: {
+        name: {
+          [Op.substring]: searchQuery ? searchQuery : '',
+        },
+        price: {
+          [Op.between]: [minPrice ? minPrice: 0, maxPrice ? maxPrice: Number.MAX_VALUE] //TODO
+        }
+      },
+      include: [
+        {
+          model: Category,
+          where: categoryFilter
+        }
+      ],
+      attributes: {exclude: ['createdAt', 'updatedAt']},
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} device`;
+  //This action returns a #${id} device
+  async findOne(deviceId: number) {
+    return await this.deviceRepository.findOne({
+      where: {id: deviceId},
+      include: [
+        {model: Brand},
+        {model: Category}
+      ]
+    });
+  }
+
+  async findById(deviceId: number) {
+    return await this.deviceRepository.findByPk(deviceId)
   }
 
   update(id: number, updateDeviceDto: UpdateDeviceDto) {
@@ -53,5 +94,15 @@ export class DevicesService {
     } catch (e) {
       throw new HttpException(e.name, HttpStatus.BAD_REQUEST)
     }
+  }
+
+  async addCategory(addCategoryDto: AddCategoryDto) {
+    const device = await this.deviceRepository.findByPk(addCategoryDto.deviceId);
+    const category = await this.categoryService.findOne(addCategoryDto.categoryId);
+    if (device && category) {
+      await device.$add('category', category.id);
+      return addCategoryDto;
+    }
+    throw new HttpException('Товар или категория не найдены', HttpStatus.NOT_FOUND);
   }
 }

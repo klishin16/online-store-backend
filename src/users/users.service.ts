@@ -8,6 +8,7 @@ import {BanUserDto} from "./dto/ban-user.dto";
 import * as bcrypt from 'bcrypt';
 import {UniqueConstraintError} from "sequelize";
 import {Device} from "../devices/models/device.model";
+import {Basket} from "../baskets/models/basket.model";
 
 @Injectable()
 export class UsersService {
@@ -40,12 +41,22 @@ export class UsersService {
     }
 
     async getUserByEmail(email: string) {
-        const user = await this.userRepository.findOne({where: {email}, include: {all: true}})
+        const user = await this.userRepository.findOne({
+            where: {email},
+            include: {all: true},
+            attributes: {exclude: ['createdAt', 'updatedAt', 'posts']}
+        })
         return user;
     }
 
     async getUserById(userId: number) {
-        return await this.userRepository.findOne({where: {id: userId}})
+        return await this.userRepository.findOne({
+            where: {id: userId},
+            attributes: {exclude: ['createdAt', 'updatedAt']},
+            include: [
+                {model: Basket}
+            ]
+        })
     }
 
     async getUserByIdWithFavoriteDevices(userId: number) {

@@ -29,18 +29,22 @@ export class AuthService {
         return this.generateToken(user)
     }
 
-    private async generateToken(user: User): Promise<{token: String}> {
+    private async generateToken(user: User): Promise<{token: String, user: User}> {
         const payload = {email: user.email, id: user.id, roles: user.roles}
         return {
-            token: this.jwtService.sign(payload)
+            token: this.jwtService.sign(payload),
+            user: user
         }
     }
 
     private async validateUser(userDto: CreateUserDto) {
         this.logger.debug("Attempt to validate user")
         const user = await this.userService.getUserByEmail(userDto.email);
+        if (!user) {
+            throw new UnauthorizedException({message: 'Пользователь не существует!'})
+        }
         const passwordEquals = await bcrypt.compare(userDto.password, user.password);
-        if (user && passwordEquals) {
+        if (passwordEquals) {
             return user;
         }
         throw new UnauthorizedException({message: 'Некорректный емайл или пароль'})

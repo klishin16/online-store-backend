@@ -1,4 +1,4 @@
-import {BelongsToMany, Column, DataType, ForeignKey, HasMany, Model, Table} from "sequelize-typescript";
+import {BelongsTo, BelongsToMany, Column, DataType, ForeignKey, HasMany, Model, Table} from "sequelize-typescript";
 import {Device, DeviceCategory} from "../../devices/models/device.model";
 
 
@@ -11,13 +11,14 @@ export class Category extends Model<Category, CategoryCreationAttrs> {
     @Column({type: DataType.INTEGER, unique: true, autoIncrement: true, primaryKey: true})
     id: number;
 
-    @Column({type: DataType.STRING, allowNull: false})
+    @Column({type: DataType.STRING, allowNull: false, unique: true})
     name: string;
-
 
     @ForeignKey(() => Category)
     @Column
-    categoryId: number;
+    parentCategoryId: number;
+    @BelongsTo(() => Category)
+    parentCategory: Category;
 
     @HasMany(() => Category)
     innerCategories: Category[];

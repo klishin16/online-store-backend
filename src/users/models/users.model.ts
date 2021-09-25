@@ -4,6 +4,7 @@ import {Role} from "../../roles/roles.model";
 import {UserRoles} from "../../roles/user-roles.model";
 import {Post} from "../../posts/posts.model";
 import {Device, UserFavoriteDevices} from "../../devices/models/device.model";
+import {Basket} from "../../baskets/models/basket.model";
 
 interface UserCreationAttrs {
     email: string;
@@ -40,5 +41,8 @@ export class User extends Model<User, UserCreationAttrs> {
     posts: Post[];
 
     @BelongsToMany(() => Device, () => UserFavoriteDevices)
-    favoriteDevices: Device[]
+    favoriteDevices: Device[];
+
+    @HasOne(() => Basket)
+    basket: Basket
 }

@@ -3,18 +3,17 @@ import {ApiProperty} from "@nestjs/swagger";
 
 export class CreateDeviceDto {
     @IsString()
-    name: string;
+    readonly name: string;
 
-    @IsNumber()
-    price: number;
+    // @IsNumber()
+    readonly price: number;
 
+    // @IsNumber()
+    readonly categoryId: number;
 
-    @IsNumber()
-    categoryId: number;
+    // @IsNumber()
+    readonly brandId: number;
 
-    @IsNumber()
-    brandId: number;
-
-    @IsNumber()
-    availability: number;
+    // @IsNumber()
+    readonly availability: number;
 }

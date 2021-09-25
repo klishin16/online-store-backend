@@ -2,7 +2,9 @@ import {BelongsTo, BelongsToMany, Column, DataType, ForeignKey, HasMany, Model, 
 import {Brand} from "../../brands/models/brand.model";
 import {Category} from "../../categories/models/category.model";
 import {User} from "../../users/models/users.model";
-// import {, FavoriteDevice} from "../../favorite-devices/models/favorite-device.model";
+import {Basket} from "../../baskets/models/basket.model";
+import {BasketDevice} from "../../baskets/models/basket_device.model";
+
 
 interface DeviceCreationAttrs {
     name: string;
@@ -10,6 +12,7 @@ interface DeviceCreationAttrs {
     categoryId: number;
     brandId: number;
     availability: number;
+    image: any;
 }
 
 @Table({tableName: 'devices'})
@@ -29,6 +32,10 @@ export class Device extends Model<Device, DeviceCreationAttrs> {
     @Column({type: DataType.INTEGER})
     availability: number;
 
+    @Column({type: DataType.STRING})
+    image: string;
+
+
 
     @BelongsToMany(() => Device, () => UserFavoriteDevices)
     deviceFavorites: Device[];
@@ -44,6 +51,8 @@ export class Device extends Model<Device, DeviceCreationAttrs> {
     @BelongsToMany(() => Category, () => DeviceCategory)
     categories: Category[];
 
+    @BelongsToMany(() => Basket, () => BasketDevice)
+    baskets: Basket[];
 }
 
 
